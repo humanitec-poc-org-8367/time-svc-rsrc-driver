@@ -1,6 +1,6 @@
-# Score - Time-svc-rsrc-driver
+# Time of day service resource driver
 
-A simple score project deploying a hello world app.
+A project to explore how to write a custom humanitec resource driver
 
 ## Deploying
 
@@ -8,4 +8,4 @@ A simple score project deploying a hello world app.
 
 ## The Workload
 
-The workload is a simple nodejs app which is dockerized.
+The workload is a nodejs REST app which implements the Humanitec [resource driver API](https://developer.humanitec.com/drivers/reference/api-spec/)
