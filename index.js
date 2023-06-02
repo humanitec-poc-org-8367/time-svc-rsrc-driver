@@ -1,52 +1,75 @@
-const http = require('http');
-const mysql = require('mysql2');
+const fastify = require('fastify')({ logger: true })
 
-// create the connection to database
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost'  ,
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'secret',
-  database: process.env.DB_DATABASE || 'score',
-  port: process.env.DB_PORT || 3306
-});
+const outputData = {
+  type: 'time-of-day-service',
+  resource: {
+    secrets: {
+      password: 'secret'
+    },
+    values: {
+      host: 'tods.somewhere.org',
+      port: 3030
+    },
+    manifests: []
+  }
+};
 
-const requestHandler = async (request, response) => {
-  console.log(request.url);
+// trivial ephemeral state management 
+var consumers = [];
 
-  // Run hello world query
-  const [rows, fields] = await connection.promise().query('SELECT "This is an example application deployed with Score!" as message');
+fastify.get('/', async () => {
+  console.log('GET /');
+  return 'Time of day service resource driver';
+})
 
-  const message = rows[0].message;
+fastify.get('/tods', async () => {
+  console.log('GET /tods'); 
+  return {'consumers': consumers};
+})
 
-  const html = `
-  <html>
-    <body>
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-      <div class="container text-center mt-5 pt-5">
-        <h1>Hello World!</h1>
-        <p>${message}</p>
-      </div>
-    </body>
-  </html>
-  `
+fastify.put('/tods/:resId', async (req, rsp) => {
+  const {resId} = req.params;
+  const cookie = req.headers['set-humanitec-driver-cookie'];
 
-  response.end(html);
-}
+  console.log(`PUT /tods/resId=${resId}, cookie=${cookie}`);
 
-const server = http.createServer(requestHandler);
-
-const port = process.env.PORT || 8080;
-
-server.listen(port, (err) => {
-  if (err) {
-    return console.log('something bad happened', err);
+  if (!consumers.find(e => e === resId)) {
+    consumers.push(resId);
+    console.log(`Registered consumer: resId=${resId}`);
+  } else {
+    console.log(`Consumer already registered - nothing to do: resId=${resId}`);
   }
 
-  console.log(`server is listening on ${port}`);
-});
+  rsp
+    .code(200)
+    .send(outputData); 
+})
 
-// Exit the process when signal is received (For docker)
-process.on('SIGINT', () => {
-  process.exit();
-});
+fastify.delete('/tods/:resId', async (req, rsp) => {
+  const {resId} = req.params;
+  const cookie = req.headers['set-humanitec-driver-cookie'];
+
+  console.log(`DELETE /tods/resId=${resId}, cookie=${cookie}`);
+
+  if (consumers.find(e => e === resId)) {
+    consumers = consumers.filter(e => e !== resId);
+    console.log(`Unegistered consumer: resId=${resId}`);
+  } else {
+    console.log(`No consumer was registered - nothing to do: resId=${resId}`);
+  }
+
+  rsp
+    .code(204)
+    .send(); 
+})
+
+const start = async () => {
+  try {
+    await fastify.listen({ port: 3000 })
+  } catch (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+}
+start()
+
