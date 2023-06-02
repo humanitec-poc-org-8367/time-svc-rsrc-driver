@@ -22,7 +22,7 @@ fastify.get('/', async () => {
   return 'Time of day service resource driver';
 })
 
-fastify.get('/tods', async () => {
+fastify.get('/tods/consumers', async () => {
   console.log('GET /tods'); 
   return {'consumers': consumers};
 })
