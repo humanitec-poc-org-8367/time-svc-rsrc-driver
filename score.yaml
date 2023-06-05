@@ -15,6 +15,10 @@ containers:
   frontend:
     variables:
       PORT: "3000"
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 3000
 
 # Define the resources that this service needs
 resources:
