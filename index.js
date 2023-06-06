@@ -1,7 +1,7 @@
 const fastify = require('fastify')({ logger: true })
 
 const outputData = {
-  type: 'time-of-day-service',
+  type: 's3',
   resource: {
     secrets: {
       password: 'secret'
@@ -30,7 +30,7 @@ fastify.get('/', { logLevel: 'silent' }, async () => {
 
 // list our registered consumers
 fastify.get('/tods/consumers', async () => {
-  console.log('GET /tods'); 
+  console.log('GET /tods/consumers'); 
   return {'consumers': consumers};
 })
 

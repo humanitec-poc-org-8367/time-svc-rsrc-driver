@@ -5,6 +5,6 @@ humctl api POST /orgs/htc-demo-04/resources/drivers -d \
   "inputs_schema": {},
   "is_public": true,
   "target": "https://rogahnjohnstonboscoschneider.newapp.io/tods/",
-  "type": "dns"
+  "type": "s3"
 }'
 
