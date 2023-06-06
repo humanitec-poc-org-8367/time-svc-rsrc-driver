@@ -14,22 +14,30 @@ const outputData = {
   }
 };
 
+const HUM_COOKIE_NAME = 'set-humanitec-driver-cookie';
+
+const makeHumanitecCookieInBase64 = (resId) => {
+  return btoa(JSON.stringify({id: resId}));
+};
+
 // trivial ephemeral state management 
 var consumers = [];
 
-fastify.get('/', async () => {
-  console.log('GET /');
+// used as a readiness probe so we don't log from this path
+fastify.get('/', { logLevel: 'silent' }, async () => {
   return 'Time of day service resource driver';
 })
 
+// list our registered consumers
 fastify.get('/tods/consumers', async () => {
   console.log('GET /tods'); 
   return {'consumers': consumers};
 })
 
+// create or update a consumer
 fastify.put('/tods/:resId', async (req, rsp) => {
   const {resId} = req.params;
-  const cookie = req.headers['set-humanitec-driver-cookie'];
+  const cookie = req.headers[HUM_COOKIE_NAME];
 
   console.log(`PUT /tods/resId=${resId}, cookie=${cookie}`);
 
@@ -40,14 +48,19 @@ fastify.put('/tods/:resId', async (req, rsp) => {
     console.log(`Consumer already registered - nothing to do: resId=${resId}`);
   }
 
+  const rspCookie = makeHumanitecCookieInBase64(resId);
+  console.log(`Set response cookie: ${rspCookie}`);
+
   rsp
     .code(200)
+    .headers(HUM_COOKIE_NAME, rspCookie)
     .send(outputData); 
 })
 
+// remove a consumer
 fastify.delete('/tods/:resId', async (req, rsp) => {
   const {resId} = req.params;
-  const cookie = req.headers['set-humanitec-driver-cookie'];
+  const cookie = req.headers[HUM_COOKIE_NAME];
 
   console.log(`DELETE /tods/resId=${resId}, cookie=${cookie}`);
 
@@ -60,12 +73,12 @@ fastify.delete('/tods/:resId', async (req, rsp) => {
 
   rsp
     .code(204)
+    .headers(HUM_COOKIE_NAME, '')
     .send(); 
 })
 
 const start = async () => {
   try {
-    // await fastify.listen({ port: 3000 })
     await fastify.listen({ port: 3000, host: '0.0.0.0'})
   } catch (err) {
     fastify.log.error(err)
