@@ -1,17 +1,20 @@
 const fastify = require('fastify')({ logger: true })
 
-const outputData = {
-  type: 's3',
-  resource: {
-    secrets: {
-      password: 'secret'
-    },
-    values: {
-      host: 'tods.somewhere.org',
-      port: 3030
-    },
-    manifests: []
-  }
+const createResponse = (resId) => {
+  return {
+    id: resId,
+    type: 's3',
+    resource: {
+      secrets: {
+        password: 'secret'
+      },
+      values: {
+        host: 'tods.somewhere.org',
+        port: 3030
+      },
+      manifests: []
+    }  
+  };
 };
 
 const HUM_COOKIE_NAME = 'set-humanitec-driver-cookie';
@@ -54,7 +57,7 @@ fastify.put('/tods/:resId', async (req, rsp) => {
   rsp
     .code(200)
     .headers(HUM_COOKIE_NAME, rspCookie)
-    .send(outputData); 
+    .send(createResponse(resId)); 
 })
 
 // remove a consumer
