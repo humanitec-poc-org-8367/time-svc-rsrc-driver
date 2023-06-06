@@ -42,7 +42,7 @@ fastify.put('/tods/:resId', async (req, rsp) => {
   const {resId} = req.params;
   const cookie = req.headers[HUM_COOKIE_NAME];
 
-  console.log(`PUT /tods/resId=${resId}, cookie=${cookie}`);
+  console.log(`PUT /tods/${resId}, cookie=${cookie}`);
 
   if (!consumers.find(e => e === resId)) {
     consumers.push(resId);
@@ -65,7 +65,7 @@ fastify.delete('/tods/:resId', async (req, rsp) => {
   const {resId} = req.params;
   const cookie = req.headers[HUM_COOKIE_NAME];
 
-  console.log(`DELETE /tods/resId=${resId}, cookie=${cookie}`);
+  console.log(`DELETE /tods/${resId}, cookie=${cookie}`);
 
   if (consumers.find(e => e === resId)) {
     consumers = consumers.filter(e => e !== resId);
