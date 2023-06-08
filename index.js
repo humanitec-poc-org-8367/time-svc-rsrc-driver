@@ -1,6 +1,6 @@
 const fastify = require('fastify')({ logger: true })
 
-const TODS_HOST = process.env.TODS_HOST;
+const TODS_HOST = process.env.TODS_HOST || 'ratkefaheyvandervortbradtkegraham.newapp.io';
 const TODS_PORT = process.env.TODS_PORT || '443';
 
 const TODS_BASE_URL = `https://${TODS_HOST}:${TODS_PORT}`;
@@ -58,7 +58,8 @@ fastify.get('/tods/consumers', async (req, rsp) => {
       return;  
     }
 
-    rsp.code(200).send(r.body); 
+    const body = await r.json();
+    rsp.code(200).send(body); 
   }
   catch (err) {
     errorResponse(rsp, `Unexpected error calling remote service: ${err}`);
