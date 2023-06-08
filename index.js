@@ -58,7 +58,7 @@ fastify.get('/tods/consumers', async (req, rsp) => {
       return;  
     }
 
-    rsp.code(200).send(r.json); 
+    rsp.code(200).send(r.body); 
   }
   catch (err) {
     errorResponse(rsp, `Unexpected error calling remote service: ${err}`);
