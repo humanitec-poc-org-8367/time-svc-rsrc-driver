@@ -15,6 +15,8 @@ containers:
   frontend:
     variables:
       PORT: "3000"
+      TODS_HOST: ratkefaheyvandervortbradtkegraham.newapp.io
+      TODS_PORT: "443"
     livenessProbe:
       httpGet:
         path: /

@@ -67,5 +67,10 @@ jobs:
               image: $ECR/$IMAGE:$TAG
           EOF
 
-          ./score-humanitec delta --env development --overrides ./humanitec.score.yaml --app time-svc-rsrc-driver --org="${{ secrets.HUMANITEC_ORG_ID_POC_4 }}" --token "${{ secrets.HUMANITEC_TOKEN_POC_4 }}" --deploy
+          ./score-humanitec delta --env development \
+            --overrides ./humanitec.score.yaml \
+            --app time-svc-rsrc-driver \
+            --org="${{ secrets.HUMANITEC_ORG_ID_POC_4 }}" \
+            --token "${{ secrets.HUMANITEC_TOKEN_POC_4 }}" \
+            --deploy
 
