@@ -1,11 +1,13 @@
 const fastify = require('fastify')({ logger: true })
 
-const TODS_HOST = process.env.TODS_HOST || 'ratkefaheyvandervortbradtkegraham.newapp.io';
+const TODS_HOST = process.env.TODS_HOST;
 const TODS_PORT = process.env.TODS_PORT || '443';
 
 const TODS_BASE_URL = `https://${TODS_HOST}:${TODS_PORT}`;
 
 const HUM_COOKIE_NAME = 'set-humanitec-driver-cookie';
+
+failureCode = '';
 
 const createRegistrationResponse = (resId) => {
   return {
@@ -66,6 +68,18 @@ fastify.get('/tods/consumers', async (req, rsp) => {
   }
 })
 
+// allow us to simulate failures
+fastify.put('/tods/failure/:code', async (req, rsp) => {
+  const {code} = req.params;
+  failureCode = code;
+  console.log(`PUT tods/failure, set code to: [${code}]`);
+})
+
+fastify.get('/tods/failure', async (req, rsp) => {
+  console.log(`GET tods/failure, code=[${code}]`);
+  return `failure code=${code}`;
+})
+
 // create or update a consumer in the remote service
 fastify.put('/tods/:resId', async (req, rsp) => {
   const {resId} = req.params;
@@ -73,6 +87,11 @@ fastify.put('/tods/:resId', async (req, rsp) => {
   const url = `${TODS_BASE_URL}/consumers/${resId}`;
 
   console.log(`PUT /tods/${resId}, cookie=${cookie}, url=${url}`);
+
+  if (failureCode !== '') {    
+    errorResponse(rsp, `Simulated failure while registering consumer: remote status=${failureCode}, text=Simulated failure`);
+    return; 
+  }
 
   try {
     const r = await fetch(new Request(url, {method: "PUT"}));
@@ -112,7 +131,7 @@ fastify.delete('/tods/:resId', async (req, rsp) => {
       return;  
     }
 
-    console.log(`Unegistered consumer from remote service: resId=${resId}`);
+    console.log(`Unregistered consumer from remote service: resId=${resId}`);
 
     rsp
       .code(204)
