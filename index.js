@@ -1,6 +1,6 @@
 const fastify = require('fastify')({ logger: true })
 
-const TODS_HOST = process.env.TODS_HOST;
+const TODS_HOST = process.env.TODS_HOST || 'test';
 const TODS_PORT = process.env.TODS_PORT || '443';
 
 const TODS_BASE_URL = `https://${TODS_HOST}:${TODS_PORT}`;
@@ -76,8 +76,8 @@ fastify.put('/tods/failure/:code', async (req, rsp) => {
 })
 
 fastify.get('/tods/failure', async (req, rsp) => {
-  console.log(`GET tods/failure, code=[${code}]`);
-  return `failure code=${code}`;
+  console.log(`GET tods/failure, code=[${failureCode}]`);
+  return `failure code=${failureCode}`;
 })
 
 // create or update a consumer in the remote service
